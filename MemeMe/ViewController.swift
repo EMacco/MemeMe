@@ -37,7 +37,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        disableButtons()
+        activateButtons(false)
         configureTextField(textField: topTextField, font: .Default)
         configureTextField(textField: bottomTextField, font: .Default)
         navigationController?.navigationBar.barTintColor = UIColor.orange
@@ -157,7 +157,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func cancelBtnClicked(_ sender: UIBarButtonItem) {
-        disableButtons()
+        memeImageView.image = nil
+        memedImage = nil
+        topTextField.text = top
+        bottomTextField.text = bottom
+        activateButtons(false)
     }
     
     @IBAction func selectImageSource(_ sender: UIBarButtonItem) {
@@ -188,10 +192,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.editedImage] as? UIImage {
             memeImageView.image = image
-            enableButtons()
+            activateButtons(true)
         } else if let image = info[.originalImage] as? UIImage {
             memeImageView.image = image
-            enableButtons()
+            activateButtons(true)
         }
         dismiss(animated: true, completion: nil)
     }
@@ -200,28 +204,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         dismiss(animated: true, completion: nil)
     }
     
-    func enableButtons() {
-        cancelBtn.isEnabled = true
-        shareBtn.isEnabled = true
-        selectImgLbl.isHidden = true
-        imageScaleBtn.isEnabled = true
-        topTextField.alpha = 1
-        bottomTextField.alpha = 1
+    func activateButtons(_ enabled: Bool) {
+        cancelBtn.isEnabled = enabled
+        shareBtn.isEnabled = enabled
+        selectImgLbl.isHidden = enabled
+        imageScaleBtn.isEnabled = enabled
+        topTextField.alpha = enabled ? 1 : 0
+        bottomTextField.alpha = enabled ? 1 : 0
     }
-    
-    func disableButtons() {
-        memeImageView.image = nil
-        memedImage = nil
-        topTextField.text = top
-        bottomTextField.text = bottom
-        cancelBtn.isEnabled = false
-        shareBtn.isEnabled = false
-        selectImgLbl.isHidden = false
-        imageScaleBtn.isEnabled = false
-        topTextField.alpha = 0
-        bottomTextField.alpha = 0
-    }
-    
+
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField.text == top || textField.text == bottom {
             textField.text = ""
@@ -239,11 +230,4 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         textField.resignFirstResponder()
         return true
     }
-}
-
-struct Meme {
-    let topText: String
-    let bottomText: String
-    let originalImage: UIImage
-    let memedImage: UIImage
 }
