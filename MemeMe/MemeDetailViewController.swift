@@ -29,7 +29,7 @@ class MemeDetailViewController: UIViewController, HomeViewDelegate {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let navVC = segue.destination as? UINavigationController {
-            let createMemeVC = navVC.viewControllers.first as! ViewController
+            let createMemeVC = navVC.viewControllers.first as! MemeViewController
             createMemeVC.currentMeme = meme
             createMemeVC.homeViewDelegate = self
         }

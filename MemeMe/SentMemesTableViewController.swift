@@ -11,8 +11,7 @@ import UIKit
 class SentMemesTableViewController: UITableViewController, HomeViewDelegate {
     
     var memes: [Meme]! {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        return appDelegate.memes
+        return MemesManager.shared.getAllMemes()
     }
     
     let reusableCellIdentifier = "SentMemeTableViewCell"
@@ -58,7 +57,7 @@ class SentMemesTableViewController: UITableViewController, HomeViewDelegate {
     
     func deleteAction(at indexPath: IndexPath) -> UIContextualAction {
         let action = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
-            (UIApplication.shared.delegate as! AppDelegate).memes.remove(at: indexPath.row)
+            MemesManager.shared.delete(meme: self.memes[indexPath.row])
             self.tableView.deleteRows(at: [indexPath], with: .automatic)
         }
         action.image = #imageLiteral(resourceName: "trash")
@@ -73,7 +72,7 @@ class SentMemesTableViewController: UITableViewController, HomeViewDelegate {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == createMemeSegueIdentifier {
-            let controller = (segue.destination as? UINavigationController)?.viewControllers.first as? ViewController
+            let controller = (segue.destination as? UINavigationController)?.viewControllers.first as? MemeViewController
             controller?.homeViewDelegate = self
         }
     }

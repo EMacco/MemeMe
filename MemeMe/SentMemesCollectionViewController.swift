@@ -13,8 +13,7 @@ private let reuseIdentifier = "SentMemeCollectionViewCell"
 class SentMemesCollectionViewController: UICollectionViewController, HomeViewDelegate {
     
     var memes: [Meme]! {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        return appDelegate.memes
+        return MemesManager.shared.getAllMemes()
     }
     @IBOutlet var flowLayout: UICollectionViewFlowLayout!
     let memeDetailIdentifier = "MemeDetailViewController"
@@ -71,7 +70,7 @@ class SentMemesCollectionViewController: UICollectionViewController, HomeViewDel
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == createMemeSegueIdentifier {
-            let controller = (segue.destination as? UINavigationController)?.viewControllers.first as? ViewController
+            let controller = (segue.destination as? UINavigationController)?.viewControllers.first as? MemeViewController
             controller?.homeViewDelegate = self
         }
     }

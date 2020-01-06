@@ -14,7 +14,7 @@ enum TextFont: String, CaseIterable {
     case Courier
 }
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+class MemeViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
@@ -88,11 +88,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: memeImageView.image!, memedImage: memedImage)
         
         if let currentMeme = currentMeme {
-            let currentMemeIndex = (UIApplication.shared.delegate as! AppDelegate).memes.firstIndex { $0.memedImage == currentMeme.memedImage }
-            (UIApplication.shared.delegate as! AppDelegate).memes.remove(at: currentMemeIndex!)
+            MemesManager.shared.delete(meme: currentMeme)
         }
         
-        (UIApplication.shared.delegate as! AppDelegate).memes.insert(meme, at: 0)
+        MemesManager.shared.add(meme: meme)
         homeViewDelegate?.reloadDataView(meme)
         dismiss(animated: true, completion: nil)
     }
