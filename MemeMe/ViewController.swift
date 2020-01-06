@@ -34,6 +34,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     var backgroundOn = true
     var aspectFit = true
     
+    var currentMeme: Meme?
+    var homeViewDelegate: HomeViewDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -41,6 +44,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         configureTextField(textField: topTextField, font: .Default)
         configureTextField(textField: bottomTextField, font: .Default)
         navigationController?.navigationBar.barTintColor = UIColor.orange
+        
+        if let _ = currentMeme {
+            populateMeme()
+        }
+    }
+    
+    func populateMeme() {
+        memeImageView.image = currentMeme?.originalImage
+        topTextField.text = currentMeme?.topText
+        bottomTextField.text = currentMeme?.bottomText
+        activateButtons(true)
     }
     
     @IBAction func changeBackgroundColor(_ sender: UIBarButtonItem) {
@@ -71,15 +85,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     
     func save() {
-        let _ = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: memeImageView.image!, memedImage: memedImage)
+        let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: memeImageView.image!, memedImage: memedImage)
         
-        let alertView = UIAlertController(title: "Meme Saved!", message: "Meme has been saved successfully", preferredStyle: .alert)
-        present(alertView, animated: true, completion: nil)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.dismiss(animated: true, completion: nil)
+        if let currentMeme = currentMeme {
+            let currentMemeIndex = (UIApplication.shared.delegate as! AppDelegate).memes.firstIndex { $0.memedImage == currentMeme.memedImage }
+            (UIApplication.shared.delegate as! AppDelegate).memes.remove(at: currentMemeIndex!)
         }
         
+        (UIApplication.shared.delegate as! AppDelegate).memes.insert(meme, at: 0)
+        homeViewDelegate?.reloadDataView(meme)
+        dismiss(animated: true, completion: nil)
     }
     
     func generateMemedImage() -> UIImage {
@@ -157,11 +172,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func cancelBtnClicked(_ sender: UIBarButtonItem) {
-        memeImageView.image = nil
-        memedImage = nil
-        topTextField.text = top
-        bottomTextField.text = bottom
-        activateButtons(false)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func selectImageSource(_ sender: UIBarButtonItem) {
@@ -205,7 +216,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func activateButtons(_ enabled: Bool) {
-        cancelBtn.isEnabled = enabled
         shareBtn.isEnabled = enabled
         selectImgLbl.isHidden = enabled
         imageScaleBtn.isEnabled = enabled
@@ -229,5 +239,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
 }
