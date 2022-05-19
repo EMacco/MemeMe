@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+#region Branch
+readonly ERROR_MESSAGE="
+💥 Branch name doesn't conform with the defined branch naming format
+📖 https://github.com/deliveryhero/pd-mob-b2c-ios/wiki/Contributing-And-PR-Guide
+
+🤓 good names starts with: (yes, prefix)
+    ☑ feature
+    ☑ bugfix 
+    ☑ uitests 
+    ☑ improvement 
+    ☑ private ← use private for any experiments, etc – this is your private zone
+
+👉 general format is:
+    {prefix}/{JIRA-TICKET}/description-with-dash.dot_or_underscore
+
+👉 you still able to use a 'Jocker' and provide your Squad name with NOTICKET instead of jira ticket: 
+   bugfix/MOBINFRA-NOTICKET/description-with-dash.dot_or_underscore
+
+Examples: 
+✅ improvement/MOBINFRA-3000/add–forgotten-prefixes-to-pre-push-script
+✅ private/my-cool-experiment (private/description doesn't need a ticket in the name)
+✅ private/JIRA-1/my-cool-experiment
+✅ bugfix/MOBINFRA-NOTICKET/quik-fix-for-danger-rules
+💥 myfeature-with-cool-stuff
+💥 hotfix/JIRA-1/something-to-fix-on-development-branch
+ 
+🙇‍♂️ to rename branch: git branch -m <old> <new>
+
+"
+readonly VALID_BRANCH_NAMES=(
+    '^(feature|bugfix|uitests|improvement)\/[[:alpha:]]+[-]([[:alnum:]]+|NOTICKET)\/[[:alnum:]_.-]+$'
+    '^private\/.*$'
+    '^release\/ios\/.*$'
+    '^hotfix\/ios\/.*$'
+    '^development$'
+)
+
+shopt -s nocasematch
+
+echo "Checking branch name..."
+branch="$(git rev-parse --abbrev-ref HEAD)"
+combined_expression=$(
+    IFS='|'
+    echo "${VALID_BRANCH_NAMES[*]}"
+)
+
+if [[ ! $branch =~ $combined_expression ]]; then
+    echo "***********************************************"
+    echo "$ERROR_MESSAGE"
+    echo "Exit code: 1"
+    echo "***********************************************"
+    exit 1
+fi
+#endregion
+
+#region Success
+echo "No issues found. Proceeding with push."
+exit 0
+#endregion
